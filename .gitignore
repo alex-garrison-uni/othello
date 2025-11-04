@@ -1,0 +1,6 @@
+*.pdf
+
+index.html
+index_files
+
+.venv
