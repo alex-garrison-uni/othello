@@ -1,4 +1,23 @@
+[project]
+name = "Othello"
+version = "0.0.0"
+description = "Coursework 2 for ECM1400."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+
 [tool.ruff]
 line-length = 110
 select = ["E", "F", "D"]
 ignore = ["D100"]
+per-file-ignores = { "tests/*" = ["D"] }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "ruff>=0.14.3",
+]
