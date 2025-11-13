@@ -1,50 +1,83 @@
+from typing import Optional
 from .components import (
-    initialise_board, print_board, legal_move, 
-    make_move, find_winner, invert_player_colour
+    initialise_board, print_board, make_move, 
+    find_winner, invert_player_colour, player_can_move
 )
+from .ai import get_ai_move, get_random_move
 
 BOARD_SIZE = 8
+MAX_MOVES = 60
+STARTING_PLAYER = "Dark"
 
-def get_board_with_moves(
-        cell_assignments: list[tuple[int, int, str]],
-        board_size: int = 8,
-    ):
-    """Set the given coordinates on the board to the given colour."""
-    board = initialise_board(board_size)
+# Game Modes (in order)
+# Player versus Player
+# Player versus AI
+PVP_MODE = 1
+PVAI_MODE = 2
 
-    for row, col, colour in cell_assignments:
-        board[row][col] = colour
+def parse_coords_input(coords_input: str) -> tuple:
+    """Parse and return input board coordinates."""
+    # Input has whitespace removed to allow for user error, and is converted to a 0-based index
+    coords = tuple(int(coord.strip()) - 1 for coord in coords_input.strip().split(','))
 
-    return board
+    # Check that the input has only two values
+    assert len(coords) == 2
+
+    # Bounds check the input
+    coord_row, coord_col = coords
+    if not (0 <= coord_row < BOARD_SIZE and 0 <= coord_col < BOARD_SIZE):
+        raise ValueError()
+    
+    return coords
 
 def cli_coords_input() -> tuple:
-    """Return user-input board coordinates."""
+    """Prompt user to input valid board coordinates."""
     valid_input = False
 
-    # Continually prompt user for a valid move
+    # Continually wait for valid input
     while not valid_input:
         try:
-            # Moves should be entered as two integers, comma-seperated
-            raw_input = input("Enter move: ")
+            # Input should be two integers, comma-seperated
+            user_input = input("Enter move: ")
 
-            # Input has whitespace removed to allow for user error, and is converted to a 0-based index
-            coords = tuple(int(coord.strip()) - 1 for coord in raw_input.strip().split(','))
-
-            # Check that the input has only two values
-            assert len(coords) == 2
-
-            # Bounds check the input
-            coord_row, coord_col = coords
-            if not (0 <= coord_row < BOARD_SIZE and 0 <= coord_col < BOARD_SIZE):
-                raise ValueError()
+            coords = parse_coords_input(user_input)
 
             valid_input = True
 
             continue
         except Exception:
+            # Re-prompt the user
             print("Please enter your move as two numbers between 1 and 8, comma-seperated.")
 
     return coords
+
+def game_mode_input() -> int:
+    """Prompt user to input a valid game mode."""
+    valid_input = False
+    game_mode = None
+
+    # Continually wait for valid input
+    while not valid_input:
+        try:
+            # Input should be two integers, comma-seperated
+            user_input = input("Please enter a game mode (PvP, AI): ")
+
+            parsed_input = user_input.strip().lower()
+
+            if parsed_input == "pvp":
+                game_mode = PVP_MODE
+                valid_input = True
+            elif parsed_input == "ai":
+                game_mode = PVAI_MODE
+                valid_input = True
+
+            continue
+        except Exception:
+            # Re-prompt the user
+            continue
+
+    return game_mode
+
 
 def simple_game_loop():
     """Begin the CLI game loop."""
@@ -56,10 +89,13 @@ def simple_game_loop():
     """)
 
     # Initalise game variables
-    move_counter = 60
+    move_counter = MAX_MOVES
     board = initialise_board(BOARD_SIZE)
-    current_player_colour = "Dark"
+    current_player_colour = STARTING_PLAYER
     winner = None
+
+    # Prompt the user for the game mode
+    game_mode = game_mode_input()
 
     # Continue the game loop until either one player wins, or the move counter runs out
     while move_counter > 0:
@@ -72,24 +108,18 @@ def simple_game_loop():
                     open_cell_indices.append((row, col))
 
         # Use the open cell indices to check if moves are available to the current player, or the opponent
-        legal_move_available_to_player = any(
-            legal_move(board=board, move=open_cell_index, colour=current_player_colour) 
-            for open_cell_index in open_cell_indices
-        )
+        current_player_can_move = player_can_move(board=board, colour=current_player_colour)
 
-        legal_move_available_to_opponent = any(
-            legal_move(board=board, move=open_cell_index, colour=invert_player_colour(current_player_colour)) 
-            for open_cell_index in open_cell_indices
-        )
+        opponent_can_move = player_can_move(board=board, colour=current_player_colour)
 
         # If there are no legal moves left, exit the game loop
-        if not legal_move_available_to_player and not legal_move_available_to_opponent:
+        if not current_player_can_move and not opponent_can_move:
             break
         # Skip the player's turn if they no move is available
-        elif not legal_move_available_to_player and legal_move_available_to_opponent:
+        elif not current_player_can_move and opponent_can_move:
             print(f"Skipping {current_player_colour}'s turn.")
             current_player_colour = invert_player_colour(current_player_colour)
-        elif legal_move_available_to_player:
+        elif current_player_can_move:
             move_made = False
 
             print('')
@@ -98,7 +128,14 @@ def simple_game_loop():
 
             # Continually prompt the user for a valid, legal move
             while not move_made:
-                move = cli_coords_input()
+                if game_mode == PVP_MODE:
+                    move = cli_coords_input()
+                elif game_mode == PVAI_MODE:
+                    if current_player_colour == "Dark":
+                        move = cli_coords_input()
+                    else:
+                        move = get_ai_move(board=board, colour=current_player_colour)
+                        print(f"AI move: {[i + 1 for i in move]}")
 
                 try:
                     make_move(board=board, move=move, colour=current_player_colour)
@@ -106,11 +143,11 @@ def simple_game_loop():
                     print(e)
                 else:
                     move_made = True
-            
+
             # Once the move has been made, decrement the move counter and swap turns
             move_counter -= 1
             current_player_colour = invert_player_colour(current_player_colour)
-    
+
     winner = find_winner(board)
 
     if winner:
@@ -118,5 +155,56 @@ def simple_game_loop():
     else:
         print("\nDraw.")
 
+def ai_game_loop(random_moves: bool = False) -> Optional[str]:
+    """Begin the AI game loop and return the winner."""
+    # Initalise game variables
+    move_counter = MAX_MOVES
+    board = initialise_board(BOARD_SIZE)
+    current_player_colour = STARTING_PLAYER
+
+    # Continue the game loop until either one player wins, or the move counter runs out
+    while move_counter > 0:
+        # Find the indices of all open cells
+        open_cell_indices = []
+
+        for row in range(0, BOARD_SIZE):
+            for col in range(0, BOARD_SIZE):
+                if not board[row][col]:
+                    open_cell_indices.append((row, col))
+
+        # Use the open cell indices to check if moves are available to the current player, or the opponent
+        current_player_can_move = player_can_move(board=board, colour=current_player_colour)
+
+        opponent_can_move = player_can_move(board=board, colour=current_player_colour)
+
+        # If there are no legal moves left, exit the game loop
+        if not current_player_can_move and not opponent_can_move:
+            break
+        # Skip the player's turn if they no move is available
+        elif not current_player_can_move and opponent_can_move:
+            current_player_colour = invert_player_colour(current_player_colour)
+        elif current_player_can_move:
+            move_made = False
+
+            # Get move (either AI generated, or random)
+            while not move_made:
+                if random_moves and current_player_colour is STARTING_PLAYER:
+                    move = get_random_move(board=board, colour=current_player_colour)
+                else:
+                    move = get_ai_move(board=board, colour=current_player_colour)
+
+                try:
+                    make_move(board=board, move=move, colour=current_player_colour)
+                except ValueError as e:
+                    raise e
+                else:
+                    move_made = True
+
+            # Once the move has been made, decrement the move counter and swap turns
+            move_counter -= 1
+            current_player_colour = invert_player_colour(current_player_colour)
+
+    return find_winner(board)
+
 if __name__ == "__main__":
-    simple_game_loop()
+    ai_game_loop(random_moves=False)

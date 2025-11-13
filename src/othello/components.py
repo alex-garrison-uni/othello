@@ -5,7 +5,9 @@ DIRECTIONS = {
     "NW": (-1, -1), "NE": (-1, 1), "SW": (1, -1), "SE": (1, 1)
 }
 
-def initialise_board(size: int = 8) -> list[list[Optional[str]]]:
+BOARD_TYPE = list[list[Optional[str]]]
+
+def initialise_board(size: int = 8) -> BOARD_TYPE:
     """Return the Othello board."""
     if size == 0:
         raise ValueError("Othello board size must be greater than 0.")
@@ -27,7 +29,7 @@ def initialise_board(size: int = 8) -> list[list[Optional[str]]]:
 
     return board
 
-def print_board(board: list[list[Optional[str]]]) -> None:
+def print_board(board: BOARD_TYPE) -> None:
     """Print a representation of the Othello board."""
     # Print the column indicies
     print('    ', end='')
@@ -54,7 +56,7 @@ def invert_player_colour(colour: str) -> str:
     """Return the opposite player."""
     return "Dark" if colour == "Light" else "Light"
 
-def legal_move(board: list[list[Optional[str]]], move: tuple, colour: str) -> bool:
+def legal_move(board: BOARD_TYPE, move: tuple, colour: str) -> bool:
     """Return if a move is legal for a colour on a given Othello board."""
     opponent_colour = invert_player_colour(colour)
     board_size = len(board)
@@ -100,7 +102,7 @@ def legal_move(board: list[list[Optional[str]]], move: tuple, colour: str) -> bo
     
     return False
 
-def make_move(board: list[list[Optional[str]]], move: tuple, colour: str) -> None:
+def make_move(board: BOARD_TYPE, move: tuple, colour: str) -> None:
     """Make a given move on the board."""
     if not legal_move(board=board, move=move, colour=colour):
         raise ValueError("Move is not legal.")
@@ -147,8 +149,8 @@ def make_move(board: list[list[Optional[str]]], move: tuple, colour: str) -> Non
                 for row, col in cell_indices_to_flip:
                     board[row][col] = colour
 
-def find_winner(board: list[list[Optional[str]]]) -> Optional[str]:
-    """Return the winner for a given board."""
+def count_cells_for_colour(board: BOARD_TYPE) -> dict[str, int]:
+    """Return a mapping of player colours to the amount of cells they have on a given board."""
     board_size = len(board)
     player_cell_count = {"Dark": 0, "Light": 0}
 
@@ -159,9 +161,42 @@ def find_winner(board: list[list[Optional[str]]]) -> Optional[str]:
             elif board[row][col] == "Light":
                 player_cell_count.update({"Light": player_cell_count.get("Light") + 1})
 
+    return player_cell_count
+
+def find_winner(board: BOARD_TYPE) -> Optional[str]:
+    """Return the winner for a given board."""
+    player_cell_count = count_cells_for_colour(board=board)
+
     if player_cell_count.get("Dark") > player_cell_count.get("Light"):
         return "Dark"
     elif player_cell_count.get("Light") > player_cell_count.get("Dark"):
         return "Light"
     elif player_cell_count.get("Dark") == player_cell_count.get("Light"):
         return None
+
+def get_legal_moves(board: BOARD_TYPE, colour: str) -> list[tuple]:
+    """Return a list of legal moves for a given board and colour."""
+    board_size = len(board)
+
+    open_cell_indices = []
+
+    for row in range(0, board_size):
+        for col in range(0, board_size):
+            if not board[row][col]:
+                open_cell_indices.append((row, col))
+
+    legal_moves = []
+
+    for open_cell_index in open_cell_indices:
+        is_legal = legal_move(board=board, move=open_cell_index, colour=colour) 
+
+        if is_legal:
+            legal_moves.append(open_cell_index)
+    
+    return legal_moves
+
+def player_can_move(board: BOARD_TYPE, colour: str) -> bool:
+    """Return if a given player colour can move for a given board."""
+    legal_moves_available_to_player = get_legal_moves(board=board, colour=colour)
+
+    return len(legal_moves_available_to_player) > 0
