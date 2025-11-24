@@ -2,7 +2,7 @@ import copy
 import random
 import math
 from .components import (
-    BOARD_TYPE, get_legal_moves, 
+    BOARD_TYPE, get_legal_moves,
     make_move, invert_player_colour
 )
 
@@ -19,8 +19,8 @@ def get_random_move(board: BOARD_TYPE, colour: str) -> tuple[int, int]:
 
     if len(legal_moves) == 0:
         return None
-    else:
-        return random.choice(legal_moves)
+
+    return random.choice(legal_moves)
 
 def get_ai_move(board: BOARD_TYPE, colour: str) -> tuple[int, int]:
     """Return a AI generated move for a given board and colour."""
@@ -76,7 +76,7 @@ def get_potential_board_states(board: BOARD_TYPE, colour: str) -> dict[tuple[int
 
     if len(legal_moves) == 0:
         return None
-    
+
     potential_board_states = {}
     for legal_move in legal_moves:
         potential_board_state = copy.deepcopy(board)
@@ -92,12 +92,12 @@ def get_board_position_metrics(board: BOARD_TYPE):
     board_size = len(board)
 
     metrics = {
-        "corner": 0, "edge": 0, 
+        "corner": 0, "edge": 0,
         "corner_adj": 0, "edge_adj": 0,
         "corner_adj_adj": 0, "edge_adj_adj": 0
     }
     board_position_metrics = {
-        "Dark": copy.deepcopy(metrics), 
+        "Dark": copy.deepcopy(metrics),
         "Light": copy.deepcopy(metrics)
     }
 
@@ -109,7 +109,7 @@ def get_board_position_metrics(board: BOARD_TYPE):
     for row in range(board_size):
         for col in range(board_size):
             cell = board[row][col]
-            
+
             if cell:
                 cell_metrics = board_position_metrics.get(board[row][col])
 
@@ -132,5 +132,5 @@ def get_board_position_metrics(board: BOARD_TYPE):
                 # Check for edge adjacent adjacent cells
                 elif row in edge_adj_adj_indices or col in edge_adj_adj_indices:
                     cell_metrics.update({"edge_adj_adj": cell_metrics.get("edge_adj_adj") + 1})
-    
+
     return board_position_metrics

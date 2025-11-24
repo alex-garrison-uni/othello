@@ -53,13 +53,13 @@ def test_legal_move_on_blocked_cell():
 # Test move making on horizonal and vertical axes
 make_starting_move_test_data = [
     (
-        "Dark", 
-        (5, 4), 
+        "Dark",
+        (5, 4),
         get_board_with_moves([(4, 4, "Dark"), (5, 4, "Dark")])
     ),
     (
-        "Light", 
-        (3, 5), 
+        "Light",
+        (3, 5),
         get_board_with_moves([(3, 4, "Light"), (3, 5, "Light")])
     )
 ]

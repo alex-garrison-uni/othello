@@ -1,6 +1,6 @@
 from typing import Optional
 from .components import (
-    initialise_board, print_board, make_move, 
+    initialise_board, print_board, make_move,
     find_winner, invert_player_colour, player_can_move
 )
 from .ai import get_ai_move, get_random_move
@@ -27,7 +27,7 @@ def parse_coords_input(coords_input: str) -> tuple:
     coord_row, coord_col = coords
     if not (0 <= coord_row < BOARD_SIZE and 0 <= coord_col < BOARD_SIZE):
         raise ValueError()
-    
+
     return coords
 
 def cli_coords_input() -> tuple:
@@ -181,7 +181,7 @@ def ai_game_loop(random_moves: bool = False) -> Optional[str]:
         if not current_player_can_move and not opponent_can_move:
             break
         # Skip the player's turn if they no move is available
-        elif not current_player_can_move and opponent_can_move:
+        if not current_player_can_move and opponent_can_move:
             current_player_colour = invert_player_colour(current_player_colour)
         elif current_player_can_move:
             move_made = False

@@ -1,7 +1,7 @@
 from typing import Optional
 
 DIRECTIONS = {
-    "N": (-1, 0), "S": (1, 0), "W": (0, -1), "E": (0, 1), 
+    "N": (-1, 0), "S": (1, 0), "W": (0, -1), "E": (0, 1),
     "NW": (-1, -1), "NE": (-1, 1), "SW": (1, -1), "SE": (1, 1)
 }
 
@@ -11,7 +11,7 @@ def initialise_board(size: int = 8) -> BOARD_TYPE:
     """Return the Othello board."""
     if size == 0:
         raise ValueError("Othello board size must be greater than 0.")
-    elif size % 2 != 0:
+    if size % 2 != 0:
         raise ValueError("Othello board size must be even.")
 
     # Create the nested lists with a default value of None
@@ -69,11 +69,11 @@ def legal_move(board: BOARD_TYPE, move: tuple, colour: str) -> bool:
     # Check that the move cell is open
     if board[move_row][move_col]:
         return False
-    
+
     # For each direction, traverse until you reach the end of the board, or find an illegal or legal move
     for direction_name, direction in DIRECTIONS.items():
         direction_row, direction_col = direction
-        
+
         curr_row = move_row + direction_row
         curr_col = move_col + direction_col
 
@@ -83,23 +83,23 @@ def legal_move(board: BOARD_TYPE, move: tuple, colour: str) -> bool:
             board[curr_row][curr_col] != opponent_colour:
             continue
 
-        # Continually step in the direction, until you reach the end of the board 
+        # Continually step in the direction, until you reach the end of the board
         # or encounter something other than an opponent cell
         while (
-            0 <= curr_row < board_size and 
-            0 <= curr_col < board_size and 
+            0 <= curr_row < board_size and
+            0 <= curr_col < board_size and
             board[curr_row][curr_col] == opponent_colour
         ):
             curr_row = curr_row + direction_row
             curr_col = curr_col + direction_col
 
         # If the final cell to be traversed is the player colour and on the board, it is legal
-        if (0 <= curr_row < board_size and 
-            0 <= curr_col < board_size and 
+        if (0 <= curr_row < board_size and
+            0 <= curr_col < board_size and
             board[curr_row][curr_col] == colour
         ):
             return True
-    
+
     return False
 
 def make_move(board: BOARD_TYPE, move: tuple, colour: str) -> None:
@@ -128,11 +128,11 @@ def make_move(board: BOARD_TYPE, move: tuple, colour: str) -> None:
             board[curr_row][curr_col] != opponent_colour:
                 continue
 
-            # Continually step in the direction, until you reach the end of the board 
+            # Continually step in the direction, until you reach the end of the board
             # or encounter something other than an opponent cell
             while (
-                0 <= curr_row < board_size and 
-                0 <= curr_col < board_size and 
+                0 <= curr_row < board_size and
+                0 <= curr_col < board_size and
                 board[curr_row][curr_col] == opponent_colour
             ):
                 cell_indices_to_flip.append((curr_row, curr_col))
@@ -142,8 +142,8 @@ def make_move(board: BOARD_TYPE, move: tuple, colour: str) -> None:
 
             # If the final cell to be traversed is the player colour and on the board, the direction is legal
             # Flip each of the traversed cells for that direction
-            if (0 <= curr_row < board_size and 
-                0 <= curr_col < board_size and 
+            if (0 <= curr_row < board_size and
+                0 <= curr_col < board_size and
                 board[curr_row][curr_col] == colour
             ):
                 for row, col in cell_indices_to_flip:
@@ -169,9 +169,9 @@ def find_winner(board: BOARD_TYPE) -> Optional[str]:
 
     if player_cell_count.get("Dark") > player_cell_count.get("Light"):
         return "Dark"
-    elif player_cell_count.get("Light") > player_cell_count.get("Dark"):
+    if player_cell_count.get("Light") > player_cell_count.get("Dark"):
         return "Light"
-    elif player_cell_count.get("Dark") == player_cell_count.get("Light"):
+    if player_cell_count.get("Dark") == player_cell_count.get("Light"):
         return None
 
 def get_legal_moves(board: BOARD_TYPE, colour: str) -> list[tuple]:
@@ -188,11 +188,11 @@ def get_legal_moves(board: BOARD_TYPE, colour: str) -> list[tuple]:
     legal_moves = []
 
     for open_cell_index in open_cell_indices:
-        is_legal = legal_move(board=board, move=open_cell_index, colour=colour) 
+        is_legal = legal_move(board=board, move=open_cell_index, colour=colour)
 
         if is_legal:
             legal_moves.append(open_cell_index)
-    
+
     return legal_moves
 
 def player_can_move(board: BOARD_TYPE, colour: str) -> bool:

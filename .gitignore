@@ -1,8 +1,5 @@
 *.pdf
 
-index.html
-index_files
-
 .venv
 .pytest_cache
 __pycache__
