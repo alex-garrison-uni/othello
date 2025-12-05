@@ -1,7 +1,7 @@
 import pytest
 
 from othello.components import initialise_board, legal_move, make_move, find_winner
-from testing_utils import get_board_with_moves, get_board_by_type
+from testing_utils import get_board_with_assignments, get_board_by_type
 
 @pytest.mark.parametrize("board_size", [4, 8, 10])
 def test_board_initialisation(board_size):
@@ -39,7 +39,7 @@ legal_starting_move_test_data = [
     ("Light", (2, 4), True),
     ("Light", (4, 5), False)
 ]
-@pytest.mark.parametrize("colour,move,expected", legal_starting_move_test_data)
+@pytest.mark.parametrize(("colour", "move", "expected"), legal_starting_move_test_data)
 def test_legal_starting_moves(colour, move, expected):
     starting_board = initialise_board()
 
@@ -55,15 +55,15 @@ make_starting_move_test_data = [
     (
         "Dark",
         (5, 4),
-        get_board_with_moves([(4, 4, "Dark"), (5, 4, "Dark")])
+        get_board_with_assignments([(4, 4, "Dark"), (5, 4, "Dark")])
     ),
     (
         "Light",
         (3, 5),
-        get_board_with_moves([(3, 4, "Light"), (3, 5, "Light")])
+        get_board_with_assignments([(3, 4, "Light"), (3, 5, "Light")])
     )
 ]
-@pytest.mark.parametrize("colour,move,expected", make_starting_move_test_data)
+@pytest.mark.parametrize(("colour", "move", "expected"), make_starting_move_test_data)
 def test_make_starting_moves(colour, move, expected):
     board = initialise_board()
     make_move(board=board, move=move, colour=colour)
@@ -72,7 +72,7 @@ def test_make_starting_moves(colour, move, expected):
 
 # Test move making simultaneously on horizonal, vertical and diagonal axes
 def test_make_move():
-    board = get_board_with_moves([
+    board = get_board_with_assignments([
         (2, 2, "Light"),
         (2, 3, "Light"),
         (2, 4, "Light"),
@@ -104,11 +104,13 @@ def test_make_move():
 def test_invalid_move_error():
     starting_board = initialise_board()
 
-    with pytest.raises(ValueError, match="Move values must be between 0 and the board size."):
+    # Outside board bounds
+    with pytest.raises(ValueError, match="Move is not legal."):
         make_move(board=starting_board, move=(-1, -1), colour="Dark")
 
-    with pytest.raises(ValueError, match="Move values must be between 0 and the board size."):
-        make_move(board=starting_board, move=(-1, 1), colour="Dark")
+    # Move on non-playable cell
+    with pytest.raises(ValueError, match="Move is not legal."):
+        make_move(board=starting_board, move=(1, 1), colour="Dark")
 
 find_winner_test_data = [
     (initialise_board(), None),
@@ -116,6 +118,6 @@ find_winner_test_data = [
     (get_board_by_type("full_light"), "Light"),
     (get_board_by_type("half_dark_half_light"), None),
 ]
-@pytest.mark.parametrize("board,expected", find_winner_test_data)
+@pytest.mark.parametrize(("board", "expected"), find_winner_test_data)
 def test_find_winner(board, expected):
     assert find_winner(board) == expected

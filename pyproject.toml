@@ -1,19 +1,23 @@
 [project]
 name = "Othello"
-version = "0.0.0"
+version = "0.1.0"
 description = "Coursework 2 for ECM1400."
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
     "flask>=3.1.2",
 ]
 
 [tool.ruff]
+target-version = "py312"
 line-length = 110
-lint.select = ["E", "F", "D", "W"]
+lint.select = ["E", "F", "D", "W", "N", "ANN", "LOG", "PT", "UP"]
 lint.ignore = ["D100"]
-lint.per-file-ignores = { "tests/*" = ["D"], "__init__.py" = ["D"] }
+lint.per-file-ignores = { "tests/test_*" = ["D", "ANN"], "__init__.py" = ["D"] }
+
+[tool.ty]
+src.exclude = ["tests/test_*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -22,6 +26,8 @@ pythonpath = ["src"]
 [dependency-groups]
 dev = [
     "pre-commit>=4.3.0",
+    "pylint>=4.0.4",
     "pytest>=8.4.2",
     "ruff>=0.14.3",
+    "ty>=0.0.1a28",
 ]

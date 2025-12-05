@@ -1,7 +1,8 @@
-from othello.components import BOARD_TYPE, initialise_board
+from othello.components import BOARD_TYPE, CELL_TYPE, initialise_board
+from typing import Literal, cast
 
-def get_board_with_moves(
-        cell_assignments: list[tuple[int, int, str]],
+def get_board_with_assignments(
+        cell_assignments: list[tuple[int, int, CELL_TYPE]],
         board_size: int = 8,
     ) -> BOARD_TYPE:
     """Set the given coordinates on the board to the given colour."""
@@ -12,16 +13,19 @@ def get_board_with_moves(
 
     return board
 
-def get_board_by_type(board_type: str, board_size: int = 8) -> BOARD_TYPE:
+def get_board_by_type(
+        board_type: Literal["full_dark", "full_light", "half_dark_half_light"],
+        board_size: int = 8
+    ) -> BOARD_TYPE:
     """Return a board by a given type. Used for testing."""
     if board_type == "full_dark":
-        return [["Dark" for _ in range(board_size)] for _ in range(board_size)]
+        return cast(BOARD_TYPE, [["Dark" for _ in range(board_size)] for _ in range(board_size)])
     elif board_type == "full_light":
-        return [["Light" for _ in range(board_size)] for _ in range(board_size)]
+        return cast(BOARD_TYPE, [["Light" for _ in range(board_size)] for _ in range(board_size)])
     elif board_type == "half_dark_half_light":
-        board = [["Dark" for _ in range(board_size)] for _ in range(board_size)]
+        board = [["Light" for _ in range(board_size)] for _ in range(board_size)]
 
         for row in range(0, board_size // 2):
-            board[row] = ["Light" for _ in range(board_size)]
+            board[row] = ["Dark" for _ in range(board_size)]
 
-        return board
+        return cast(BOARD_TYPE, board)

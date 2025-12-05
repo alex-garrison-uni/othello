@@ -2,8 +2,8 @@ import copy
 import random
 import math
 from .components import (
-    BOARD_TYPE, get_legal_moves,
-    make_move, invert_player_colour
+    COLOUR_TYPE, BOARD_TYPE, MOVE_TYPE,
+    get_legal_moves, make_move, invert_player_colour
 )
 
 CORNER_WEIGHT = 30
@@ -13,7 +13,7 @@ EDGE_ADJ_WEIGHT = 10
 CORNER_ADJ_ADJ_WEIGHT = 6
 EDGE_ADJ_ADJ_WEIGHT = 1
 
-def get_random_move(board: BOARD_TYPE, colour: str) -> tuple[int, int]:
+def get_random_move(board: BOARD_TYPE, colour: COLOUR_TYPE) -> MOVE_TYPE | None:
     """Return a random move for a given board and colour."""
     legal_moves = get_legal_moves(board=board, colour=colour)
 
@@ -22,23 +22,25 @@ def get_random_move(board: BOARD_TYPE, colour: str) -> tuple[int, int]:
 
     return random.choice(legal_moves)
 
-def get_ai_move(board: BOARD_TYPE, colour: str) -> tuple[int, int]:
+def get_ai_move(board: BOARD_TYPE, colour: COLOUR_TYPE) -> MOVE_TYPE | None:
     """Return a AI generated move for a given board and colour."""
     potential_board_states = get_potential_board_states(board=board, colour=colour)
 
     best_scoring_move = None
     highest_board_score = -math.inf
-    for move, potential_board_state in potential_board_states.items():
-        potential_board_score = score_board(board=potential_board_state, colour=colour)
 
-        if potential_board_score > highest_board_score:
-            highest_board_score = potential_board_score
-            best_scoring_move = move
+    if potential_board_states is not None:
+        for move, potential_board_state in potential_board_states.items():
+            potential_board_score = score_board(board=potential_board_state, colour=colour)
+
+            if potential_board_score > highest_board_score:
+                highest_board_score = potential_board_score
+                best_scoring_move = move
 
     return best_scoring_move
 
-def score_board(board: BOARD_TYPE, colour: str) -> int:
-    """Return a score for a given board and colour between -200 to 200."""
+def score_board(board: BOARD_TYPE, colour: COLOUR_TYPE) -> int:
+    """Return a score for a given board and colour."""
     opponent_colour = invert_player_colour(colour)
     score = 0
 
@@ -57,27 +59,31 @@ def score_board(board: BOARD_TYPE, colour: str) -> int:
     board_position_metrics = get_board_position_metrics(board=board)
     player_metrics = board_position_metrics.get(colour)
 
-    player_score = (
-        player_metrics.get("corner") * CORNER_WEIGHT
-        + player_metrics.get("edge") * EDGE_WEIGHT
-        - player_metrics.get("corner_adj") * CORNER_ADJ_WEIGHT
-        - player_metrics.get("edge_adj") * EDGE_ADJ_WEIGHT
-        + player_metrics.get("corner_adj_adj") * CORNER_ADJ_ADJ_WEIGHT
-        + player_metrics.get("edge_adj_adj") * EDGE_ADJ_ADJ_WEIGHT
-    )
+    player_score = 0
+
+    if player_metrics is not None:
+        player_score = (
+            player_metrics.get("corner", 0) * CORNER_WEIGHT
+            + player_metrics.get("edge", 0) * EDGE_WEIGHT
+            - player_metrics.get("corner_adj", 0) * CORNER_ADJ_WEIGHT
+            - player_metrics.get("edge_adj", 0) * EDGE_ADJ_WEIGHT
+            + player_metrics.get("corner_adj_adj", 0) * CORNER_ADJ_ADJ_WEIGHT
+            + player_metrics.get("edge_adj_adj", 0) * EDGE_ADJ_ADJ_WEIGHT
+        )
 
     score += player_score
 
     return score
 
-def get_potential_board_states(board: BOARD_TYPE, colour: str) -> dict[tuple[int, int], BOARD_TYPE]:
+def get_potential_board_states(board: BOARD_TYPE, colour: COLOUR_TYPE) -> dict[MOVE_TYPE, BOARD_TYPE] | None:
     """Return a mapping of potential moves to board states from a given board state, for a given colour."""
     legal_moves = get_legal_moves(board=board, colour=colour)
 
+    # If there are no legal moves, return None
     if len(legal_moves) == 0:
         return None
 
-    potential_board_states = {}
+    potential_board_states: dict[MOVE_TYPE, BOARD_TYPE] = {}
     for legal_move in legal_moves:
         potential_board_state = copy.deepcopy(board)
 
@@ -87,16 +93,16 @@ def get_potential_board_states(board: BOARD_TYPE, colour: str) -> dict[tuple[int
 
     return potential_board_states
 
-def get_board_position_metrics(board: BOARD_TYPE):
+def get_board_position_metrics(board: BOARD_TYPE) -> dict[str, dict[str, int]]:
     """Return metrics about the count of cells positioned around the board, by colour."""
     board_size = len(board)
 
-    metrics = {
+    metrics: dict[str, int] = {
         "corner": 0, "edge": 0,
         "corner_adj": 0, "edge_adj": 0,
         "corner_adj_adj": 0, "edge_adj_adj": 0
     }
-    board_position_metrics = {
+    board_position_metrics: dict[str, dict[str, int]] = {
         "Dark": copy.deepcopy(metrics),
         "Light": copy.deepcopy(metrics)
     }
@@ -108,29 +114,30 @@ def get_board_position_metrics(board: BOARD_TYPE):
 
     for row in range(board_size):
         for col in range(board_size):
-            cell = board[row][col]
+            cell= board[row][col]
 
-            if cell:
-                cell_metrics = board_position_metrics.get(board[row][col])
+            if cell is not None:
+                cell_metrics = board_position_metrics.get(cell)
 
-                # Check for corner cells
-                if row in edge_indices and col in edge_indices:
-                    cell_metrics.update({"corner": cell_metrics.get("corner") + 1})
-                # Check for edge cells
-                elif (row in edge_indices and col not in edge_adj_indices) or \
-                    (col in edge_indices and row not in edge_adj_indices):
-                    cell_metrics.update({"edge": cell_metrics.get("edge") + 1})
-                # Check for corner adjacent cells
-                elif row in edge_adj_indices and col in edge_adj_indices:
-                    cell_metrics.update({"corner_adj": cell_metrics.get("corner_adj") + 1})
-                # Check for edge adjacent cells
-                elif row in edge_adj_indices or col in edge_adj_indices:
-                    cell_metrics.update({"edge_adj": cell_metrics.get("edge_adj") + 1})
-                # Check for corner adjacent adjacent cells
-                elif row in edge_adj_adj_indices and col in edge_adj_adj_indices:
-                    cell_metrics.update({"corner_adj_adj": cell_metrics.get("corner_adj_adj") + 1})
-                # Check for edge adjacent adjacent cells
-                elif row in edge_adj_adj_indices or col in edge_adj_adj_indices:
-                    cell_metrics.update({"edge_adj_adj": cell_metrics.get("edge_adj_adj") + 1})
+                if cell_metrics is not None:
+                    # Check for corner cells
+                    if row in edge_indices and col in edge_indices:
+                        cell_metrics.update({"corner": cell_metrics.get("corner", 0) + 1})
+                    # Check for edge cells
+                    elif (row in edge_indices and col not in edge_adj_indices) or \
+                        (col in edge_indices and row not in edge_adj_indices):
+                        cell_metrics.update({"edge": cell_metrics.get("edge", 0) + 1})
+                    # Check for corner adjacent cells
+                    elif row in edge_adj_indices and col in edge_adj_indices:
+                        cell_metrics.update({"corner_adj": cell_metrics.get("corner_adj", 0) + 1})
+                    # Check for edge adjacent cells
+                    elif row in edge_adj_indices or col in edge_adj_indices:
+                        cell_metrics.update({"edge_adj": cell_metrics.get("edge_adj", 0) + 1})
+                    # Check for corner adjacent adjacent cells
+                    elif row in edge_adj_adj_indices and col in edge_adj_adj_indices:
+                        cell_metrics.update({"corner_adj_adj": cell_metrics.get("corner_adj_adj", 0) + 1})
+                    # Check for edge adjacent adjacent cells
+                    elif row in edge_adj_adj_indices or col in edge_adj_adj_indices:
+                        cell_metrics.update({"edge_adj_adj": cell_metrics.get("edge_adj_adj", 0) + 1})
 
     return board_position_metrics
