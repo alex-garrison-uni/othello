@@ -14,10 +14,11 @@ target-version = "py312"
 line-length = 100
 lint.select = ["E", "F", "D", "W", "N", "ANN", "LOG", "PT", "UP"]
 lint.ignore = ["D100"]
-lint.per-file-ignores = { "tests/test_*" = ["D", "ANN"], "__init__.py" = ["D"] }
+lint.per-file-ignores = { "tests/test_*" = ["D", "ANN"], "__init__.py" = ["D"]}
+lint.exclude = ["create_stage_archives.py"]
 
 [tool.ty]
-src.exclude = ["tests/test_*"]
+src.exclude = ["tests/test_*", "create_stage_archives.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,4 +1,4 @@
-from othello.game_engine import ai_game_loop
+from testing_utils import ai_game_loop
 
 # Test that the AI will outperform a random opponent at a statistically significant level
 def test_ai_outperforms_random_moves():
