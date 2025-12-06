@@ -75,8 +75,11 @@ def score_board(board: BOARD_TYPE, colour: COLOUR_TYPE) -> int:
 
     return score
 
-def get_potential_board_states(board: BOARD_TYPE, colour: COLOUR_TYPE) -> dict[MOVE_TYPE, BOARD_TYPE] | None:
-    """Return a mapping of potential moves to board states from a given board state, for a given colour."""
+def get_potential_board_states(
+    board: BOARD_TYPE,
+    colour: COLOUR_TYPE
+) -> dict[MOVE_TYPE, BOARD_TYPE] | None:
+    """Return a mapping of moves to board states from a given board state, for a given colour."""
     legal_moves = get_legal_moves(board=board, colour=colour)
 
     # If there are no legal moves, return None
@@ -122,22 +125,22 @@ def get_board_position_metrics(board: BOARD_TYPE) -> dict[str, dict[str, int]]:
                 if cell_metrics is not None:
                     # Check for corner cells
                     if row in edge_indices and col in edge_indices:
-                        cell_metrics.update({"corner": cell_metrics.get("corner", 0) + 1})
+                        cell_metrics["corner"] += 1
                     # Check for edge cells
                     elif (row in edge_indices and col not in edge_adj_indices) or \
                         (col in edge_indices and row not in edge_adj_indices):
-                        cell_metrics.update({"edge": cell_metrics.get("edge", 0) + 1})
+                        cell_metrics["edge"] += 1
                     # Check for corner adjacent cells
                     elif row in edge_adj_indices and col in edge_adj_indices:
-                        cell_metrics.update({"corner_adj": cell_metrics.get("corner_adj", 0) + 1})
+                        cell_metrics["corner_adj"] += 1
                     # Check for edge adjacent cells
                     elif row in edge_adj_indices or col in edge_adj_indices:
-                        cell_metrics.update({"edge_adj": cell_metrics.get("edge_adj", 0) + 1})
+                        cell_metrics["edge_adj"] += 1
                     # Check for corner adjacent adjacent cells
                     elif row in edge_adj_adj_indices and col in edge_adj_adj_indices:
-                        cell_metrics.update({"corner_adj_adj": cell_metrics.get("corner_adj_adj", 0) + 1})
+                        cell_metrics["corner_adj_adj"] += 1
                     # Check for edge adjacent adjacent cells
                     elif row in edge_adj_adj_indices or col in edge_adj_adj_indices:
-                        cell_metrics.update({"edge_adj_adj": cell_metrics.get("edge_adj_adj", 0) + 1})
+                        cell_metrics["edge_adj_adj"] += 1
 
     return board_position_metrics

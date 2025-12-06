@@ -96,7 +96,7 @@
             border: 1px solid #1f2022;
         }
         .messageBox {
-            width: 80%;
+            width: 100%;
             margin: 0 auto;
             height: 10vh; 
             border: 1px solid #1f2022; 
@@ -144,35 +144,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                //Process the response
-                if (data['status'] === 'success'){
-                    document.getElementById("turn_heading").textContent = data['player'] + "'s turn";
-                    document.getElementById("moves_heading").textContent = "Moves left: " + data['moves_left'];
-                    //Update the board
-                    board = data['board'];
-
-                    if (data['message']){
-                        updateMessageBox(data['message']);
-                    }
-                    
-                    //Reload the board
-                    loadBoard();}          
-                else if (data['status'] === 'fail'){
-                    updateMessageBox('Invalid move at (' + x + ', ' + y + '): ' + data['message']);}
-                
-                if (data['finished']){
-                    //Game is finished
-                    
-                    //Update the board
-                    board = data['board'];
-
-                    //Reload the board
-                    loadBoard();
-
-                    // Display the winner
-                    document.getElementById("turn_heading").textContent = data['message'].toString();
-                    document.getElementById("moves_heading").textContent = "";
-                }
+                applyGameState(data);
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -198,26 +170,44 @@
         }
 
         function applyGameState(data) {
-            // Update state
-            board = data.board;
+            if (data.status === 'success'){
+                if (data.finished) {
+                    // Display the winner
 
-            // Redraw board
-            loadBoard();
+                    if (data.message) {
+                        document.getElementById("turn_heading").textContent = data.message.toString();
+                    } else {
+                        document.getElementById("turn_heading").textContent = "Game Over";
+                    }
+                    
+                    document.getElementById("moves_heading").textContent = "";
+                } else {
+                    // Update headings
+                    document.getElementById("turn_heading").textContent =
+                        data.player + "'s turn";
 
-            // Update headings
-            document.getElementById("turn_heading").textContent =
-                data.player + "'s turn";
+                    document.getElementById("moves_heading").textContent =
+                        "Moves left: " + data.moves_left;
+                }
 
-            document.getElementById("moves_heading").textContent =
-                "Moves left: " + data.moves_left;
-            
-            // Update game mode selector
-            document.getElementById("game_mode_selector").value =
-                data.game_mode;
-            console.log(data.game_mode)
+                //Update the board
+                board = data.board;;
 
-            // Clear messages
-            document.getElementById('messageBox').innerHTML = "";
+                // Display the message
+                if (data.message){
+                    updateMessageBox(data.message);
+                }
+
+                //Reload the board
+                loadBoard();
+
+                // Update game mode selector
+                document.getElementById("game_mode_selector").value =
+                    data.game_mode;
+            }
+            else if (data.status === 'fail'){
+                updateMessageBox(data.message);
+            }
         }
 
         function new_game() {
@@ -230,6 +220,9 @@
             }).then(response => response.json())
             .then(data => {
                 applyGameState(data);
+
+                // Clear messages
+                document.getElementById('messageBox').innerHTML = "";
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -303,8 +296,8 @@
                     {% endfor %}
                 {% endfor %}
             </div>
+            <div id="messageBox" class="messageBox center"></div>
         </div>
     </div>
-    <div id="messageBox" class="messageBox center"></div>
 </body>
 </html>

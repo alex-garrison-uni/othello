@@ -54,7 +54,7 @@ def cli_coords_input() -> MOVE_TYPE:
             continue
         except Exception:
             # Re-prompt the user
-            print(f"Please enter your move as two numbers between 1 and {BOARD_SIZE}, comma-seperated.")
+            print(f"Enter your move as two comma-seperated numbers between 1 and {BOARD_SIZE}")
 
     return coords
 
@@ -116,7 +116,7 @@ def simple_game_loop() -> None:
 
         opponent_colour = invert_player_colour(current_player_colour)
 
-        # Use the open cell indices to check if moves are available to the current player, or the opponent
+        # Use the open cell indices to check if moves are available to any player
         current_player_can_move = player_can_move(board=board, colour=current_player_colour)
 
         opponent_can_move = player_can_move(board=board, colour=opponent_colour)
@@ -189,7 +189,7 @@ def ai_game_loop(random_moves: bool = False) -> str | None:
 
         opponent_colour = invert_player_colour(current_player_colour)
 
-        # Use the open cell indices to check if moves are available to the current player, or the opponent
+        # Use the open cell indices to check if moves are available to any player
         current_player_can_move = player_can_move(board=board, colour=current_player_colour)
 
         opponent_can_move = player_can_move(board=board, colour=opponent_colour)

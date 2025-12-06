@@ -79,7 +79,8 @@ def legal_move(board: BOARD_TYPE, move: MOVE_TYPE, colour: COLOUR_TYPE) -> bool:
     if board[move_row][move_col] is not None:
         return False
 
-    # For each direction, traverse until you reach the end of the board, or find an illegal or legal move
+    # For each direction, traverse until you reach the end of the board,
+    # or find an illegal or legal move
     for direction_name, direction in DIRECTIONS.items():
         direction_row, direction_col = direction
 
@@ -121,7 +122,8 @@ def make_move(board: BOARD_TYPE, move: MOVE_TYPE, colour: COLOUR_TYPE) -> None:
 
         move_row, move_col = move
 
-        # For each direction, traverse until you reach the end of the board, or find an illegal or legal move
+        # For each direction, traverse until you reach the end of the board,
+        # or find an illegal or legal move
         # Store the coordinates of each cell traversed, and flip each one if the move is legal
         for direction_name, direction in DIRECTIONS.items():
             cell_indices_to_flip: list[MOVE_TYPE] = [move]
@@ -149,7 +151,8 @@ def make_move(board: BOARD_TYPE, move: MOVE_TYPE, colour: COLOUR_TYPE) -> None:
                 curr_row = curr_row + direction_row
                 curr_col = curr_col + direction_col
 
-            # If the final cell to be traversed is the player colour and on the board, the direction is legal
+            # If the final cell to be traversed is the player colour
+            # and on the board, the direction is legal
             # Flip each of the traversed cells for that direction
             if (0 <= curr_row < board_size and
                 0 <= curr_col < board_size and

@@ -143,7 +143,7 @@ def upload_game() -> ResponseReturnValue:
 
 @app.route("/move", methods=["GET"])
 def move() -> ResponseReturnValue:
-    """Make a move on the board and check for a finished game. If it is the AI game mode, make an AI move."""
+    """Make a move on the board and check for a finished game. Optionally make an AI move."""
     global game_state
 
     status = "success"
@@ -219,7 +219,11 @@ def move() -> ResponseReturnValue:
         })
 
     # Check if board is full or neither player can move
-    current_can_move = player_can_move(board=game_state.board, colour=game_state.current_player_colour)
+    current_can_move = player_can_move(
+        board=game_state.board,
+        colour=game_state.current_player_colour
+    )
+
     opponent_colour = invert_player_colour(game_state.current_player_colour)
     opponent_can_move = player_can_move(board=game_state.board, colour=opponent_colour)
 

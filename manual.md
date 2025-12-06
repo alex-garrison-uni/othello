@@ -92,61 +92,51 @@ A standard JSON response format is used by the API to communicate the board stat
 	- [Success](#success) with game state with move(s) made, and any skip/win/draw message.
 	- [Failure](#failure) for invalid coordinates, illegal move, etc.
 
-## Results
+## Results Appendix
 
 ### Linting
 ```
 uv run pylint src/othello/*
 
 ************* Module othello.ai
-src/othello/ai.py:78:0: C0301: Line too long (109/100) (line-too-long)
-src/othello/ai.py:79:0: C0301: Line too long (107/100) (line-too-long)
-src/othello/ai.py:138:0: C0301: Line too long (106/100) (line-too-long)
-src/othello/ai.py:141:0: C0301: Line too long (102/100) (line-too-long)
 src/othello/ai.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 ************* Module othello.components
-src/othello/components.py:78:0: C0301: Line too long (105/100) (line-too-long)
-src/othello/components.py:120:0: C0301: Line too long (109/100) (line-too-long)
-src/othello/components.py:148:0: C0301: Line too long (109/100) (line-too-long)
 src/othello/components.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/othello/components.py:3:0: C0103: Class name "COLOUR_TYPE" doesn't conform to PascalCase naming style (invalid-name)
 src/othello/components.py:6:0: C0103: Class name "MOVE_TYPE" doesn't conform to PascalCase naming style (invalid-name)
-src/othello/components.py:46:4: C0200: Consider using enumerate instead of iterating with range and len (consider-using-enumerate)
-src/othello/components.py:79:8: W0612: Unused variable 'direction_name' (unused-variable)
-src/othello/components.py:110:0: R0914: Too many local variables (16/15) (too-many-locals)
-src/othello/components.py:112:4: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
-src/othello/components.py:122:12: W0612: Unused variable 'direction_name' (unused-variable)
-src/othello/components.py:171:0: R1710: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
+src/othello/components.py:84:8: W0612: Unused variable 'direction_name' (unused-variable)
+src/othello/components.py:115:0: R0914: Too many local variables (16/15) (too-many-locals)
+src/othello/components.py:117:4: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
+src/othello/components.py:128:12: W0612: Unused variable 'direction_name' (unused-variable)
+src/othello/components.py:178:0: R1710: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
 ************* Module othello.flask_game_engine
-src/othello/flask_game_engine.py:147:0: C0301: Line too long (109/100) (line-too-long)
-src/othello/flask_game_engine.py:223:0: C0301: Line too long (103/100) (line-too-long)
 src/othello/flask_game_engine.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/othello/flask_game_engine.py:15:0: C0103: Class name "RESPONSE_TYPE" doesn't conform to PascalCase naming style (invalid-name)
 src/othello/flask_game_engine.py:23:0: C0103: Constant name "logging_format" doesn't conform to UPPER_CASE naming style (invalid-name)
+src/othello/flask_game_engine.py:50:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
 src/othello/flask_game_engine.py:70:4: W0603: Using the global statement (global-statement)
 src/othello/flask_game_engine.py:84:4: W0603: Using the global statement (global-statement)
 src/othello/flask_game_engine.py:94:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
 src/othello/flask_game_engine.py:103:4: W0602: Using global for 'game_state' but no assignment is done (global-variable-not-assigned)
 src/othello/flask_game_engine.py:129:4: W0602: Using global for 'game_state' but no assignment is done (global-variable-not-assigned)
-src/othello/flask_game_engine.py:140:11: W0718: Catching too general exception Exception (broad-exception-caught)
-src/othello/flask_game_engine.py:148:4: W0602: Using global for 'game_state' but no assignment is done (global-variable-not-assigned)
-src/othello/flask_game_engine.py:211:11: W0718: Catching too general exception Exception (broad-exception-caught)
-src/othello/flask_game_engine.py:167:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
-src/othello/flask_game_engine.py:196:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
-src/othello/flask_game_engine.py:146:0: R0915: Too many statements (51/50) (too-many-statements)
+src/othello/flask_game_engine.py:139:11: W0718: Catching too general exception Exception (broad-exception-caught)
+src/othello/flask_game_engine.py:147:4: W0602: Using global for 'game_state' but no assignment is done (global-variable-not-assigned)
+src/othello/flask_game_engine.py:210:11: W0718: Catching too general exception Exception (broad-exception-caught)
+src/othello/flask_game_engine.py:166:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/othello/flask_game_engine.py:195:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/othello/flask_game_engine.py:145:0: R0915: Too many statements (51/50) (too-many-statements)
 ************* Module othello.game_engine
-src/othello/game_engine.py:118:0: C0301: Line too long (106/100) (line-too-long)
-src/othello/game_engine.py:185:0: C0301: Line too long (106/100) (line-too-long)
 src/othello/game_engine.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/othello/game_engine.py:31:8: W0707: Consider explicitly re-raising using 'except ValueError as exc' and 'raise ValueError('Coordinates must be integers.') from exc' (raise-missing-from)
-src/othello/game_engine.py:54:15: W0718: Catching too general exception Exception (broad-exception-caught)
-src/othello/game_engine.py:81:15: W0718: Catching too general exception Exception (broad-exception-caught)
-src/othello/game_engine.py:124:8: R1723: Unnecessary "elif" after "break", remove the leading "el" from "elif" (no-else-break)
-src/othello/game_engine.py:88:0: R0912: Too many branches (16/12) (too-many-branches)
-src/othello/game_engine.py:207:20: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
-src/othello/game_engine.py:166:0: R0912: Too many branches (14/12) (too-many-branches)
+src/othello/game_engine.py:32:8: W0707: Consider explicitly re-raising using 'except ValueError as exc' and 'raise ValueError('Coordinates must be integers.') from exc' (raise-missing-from)
+src/othello/game_engine.py:55:15: W0718: Catching too general exception Exception (broad-exception-caught)
+src/othello/game_engine.py:82:15: W0718: Catching too general exception Exception (broad-exception-caught)
+src/othello/game_engine.py:125:8: R1723: Unnecessary "elif" after "break", remove the leading "el" from "elif" (no-else-break)
+src/othello/game_engine.py:89:0: R0912: Too many branches (16/12) (too-many-branches)
+src/othello/game_engine.py:214:20: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
+src/othello/game_engine.py:173:0: R0912: Too many branches (14/12) (too-many-branches)
+
 ------------------------------------------------------------------
-Your code has been rated at 9.04/10 (previous run: 9.04/10, +0.00)
+Your code has been rated at 9.29/10 (previous run: 9.29/10, +0.00)
 ```
 
 ### Testing
